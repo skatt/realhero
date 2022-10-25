@@ -35,19 +35,11 @@
        ]).
 
 %% API
--http_api({"login", login, [{"username", binary},
+-http_api({"token", login, [{"username", binary},
                            {"password", binary},
                            {"client_id",binary},
                            {"client_secret",binary},
                            {"scope",binary}]}).
-
-%% Opaque authentication record
--record(a, { client   = undefined    :: undefined | term()
-          , resowner = undefined    :: undefined | term()
-          , scope                   :: scope()
-          , ttl      = 0            :: non_neg_integer()
-          , issuer   = undefined    :: undefined | binary()
-          }).
 
 -define(DEFAULT_REALM,{<<"RealHero">>,<<"Academy">>}).
 
@@ -56,9 +48,11 @@
 
 -type scope()    :: oauth2:scope().
 
-login(Username,Password,<<"default_realm">>,<<"no_secret">>,Scope) ->
-  login(Username,Password,?DEFAULT_REALM,Scope);
-login(Username,Password,Client_Id,Client_Secret,Scope) ->
+login(Username, Password, <<"default_realm">>, <<"no_secret">>, Scope) ->
+  {Client_Id,Client_Secret} = ?DEFAULT_REALM,
+  login(Username, Password, Client_Id, Client_Secret, Scope);
+
+login(Username, Password, Client_Id, Client_Secret, Scope) ->
   case oauth2:authorize_password({Username,Password},{Client_Id,Client_Secret},Scope,[]) of
     {ok,{Ctx0,A}} -> case oauth2:issue_token_and_refresh(A,Ctx0) of
                       {ok,{Ctx1,Response}} ->
