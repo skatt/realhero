@@ -2,6 +2,8 @@
 
 -behavior(oauth2_backend).
 
+-export([start_link/0]).
+
 %%gen_server API
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -116,6 +118,10 @@ delete_user(Username) -> delete(users, Username).
 %% gen_server callbacks
 %%--------------------------------------------------------------------
 -define(AUTH_TABLES,[access_codes, access_tokens, refresh_tokens, users, clients]).
+
+-spec(start_link() -> {ok, pid()} | ignore | {error, any()}).
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 init([]) ->
   lists:foreach(fun(Table) ->
