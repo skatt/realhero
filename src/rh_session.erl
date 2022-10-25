@@ -59,7 +59,7 @@
 login(Username,Password,<<"default_realm">>,<<"no_secret">>,Scope) ->
   login(Username,Password,?DEFAULT_REALM,Scope);
 login(Username,Password,Client_Id,Client_Secret,Scope) ->
-  case oauth2:authorize_password({Username,Password},{Client_Id,Client_Secret}},Scope,[]) of
+  case oauth2:authorize_password({Username,Password},{Client_Id,Client_Secret},Scope,[]) of
     {ok,{Ctx0,A}) -> case oauth2:issue_token_and_refresh(A,Ctx0) of
                       {ok,{Ctx1,Response}} ->
                         {ok, AccessToken} = oauth2_response:access_token(Response),
@@ -78,12 +78,10 @@ login(Username,Password,Client_Id,Client_Secret,Scope) ->
                                     {refresh_token, RefreshToken},
                                     {refresh_token_expires_in, RExpiresIn}
                                  ]}}.
-                        ]}}
-
-                      ok;
-                      E ->
+                        ]}};
+                      E -> E
                     end;
-    E ->
+    E -> E
   end.
 
 
@@ -141,7 +139,7 @@ handle_info(_Msg, State) ->
     {noreply, State}.
 
 terminate(_Reason, _State) ->
-  lists:foreach(fun ets:delete/1, ?AUTH_TABLES).
+  lists:foreach(fun ets:delete/1, ?AUTH_TABLES),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -260,7 +258,7 @@ verify_redirection_uri(#client{redirect_uri = _RegisteredUri}, _DifferentUri,
 verify_client_scope(#client{scope = RegisteredScope}, Scope, AppContext) ->
     verify_scope(RegisteredScope, Scope, AppContext).
 
-verify_resowner_scope(#resowner{scope = RegisteredScope}, Scope, AppContext) ->
+verify_resowner_scope(#user{scope = RegisteredScope}, Scope, AppContext) ->
     verify_scope(RegisteredScope, Scope, AppContext).
 
 verify_scope(RegisteredScope, undefined, AppContext) ->
