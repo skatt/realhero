@@ -1,4 +1,4 @@
--module(realhero_session).
+-module(rh_session).
 
 -behavior(oauth2_backend).
 
