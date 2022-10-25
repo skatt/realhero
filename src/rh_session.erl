@@ -60,7 +60,7 @@ login(Username,Password,<<"default_realm">>,<<"no_secret">>,Scope) ->
   login(Username,Password,?DEFAULT_REALM,Scope);
 login(Username,Password,Client_Id,Client_Secret,Scope) ->
   case oauth2:authorize_password({Username,Password},{Client_Id,Client_Secret},Scope,[]) of
-    {ok,{Ctx0,A}) -> case oauth2:issue_token_and_refresh(A,Ctx0) of
+    {ok,{Ctx0,A}} -> case oauth2:issue_token_and_refresh(A,Ctx0) of
                       {ok,{Ctx1,Response}} ->
                         {ok, AccessToken} = oauth2_response:access_token(Response),
                         {ok, ExpiresIn} = oauth2_response:expires_in(Response),
@@ -77,8 +77,7 @@ login(Username,Password,Client_Id,Client_Secret,Scope) ->
                                     {scope, ScopeOut},
                                     {refresh_token, RefreshToken},
                                     {refresh_token_expires_in, RExpiresIn}
-                                 ]}}.
-                        ]}};
+                                 ]}};
                       E -> E
                     end;
     E -> E
