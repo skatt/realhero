@@ -7,6 +7,7 @@
          terminate/2, code_change/3]).
 
 %%% API
+-export([login/5]).
 -export([add_client/4,
         add_user/2,
         add_user/3,
